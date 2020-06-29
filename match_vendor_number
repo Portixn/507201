@@ -1,0 +1,36 @@
+Sub match_vendor_number()
+'
+' Portixn
+' Ready to use, not completed
+'
+Dim targetCol As Integer
+Dim numberRows As Integer
+
+'Columns("B:B").Select
+targetCol = Worksheets("grant").Range("A:Z").Find("Grant Recipient", lookat:=xlWhole).Column
+Debug.Print "target_cell's_column is_" & targetCol
+
+'worksheet cannot be selected. Need activate here.
+Worksheets("grant").Activate
+Columns(targetCol).Select
+'insert column
+Selection.Insert Shift:=xlToRight, CopyOrigin:=xlFormatFromLeftOrAbove
+
+'Range("B1").Select
+Cells(1, targetCol).Select
+ActiveCell.FormulaR1C1 = "vendor_number" 'R1C1: set the original point
+'Range("B2").Select
+Cells(2, targetCol).Select
+'vlookup
+'RC[1],the right 1 column
+ActiveCell.FormulaR1C1 = "=VLOOKUP(RC[1],vendor_number!C1:C2,2,FALSE)"
+ActiveWindow.DisplayFormulas = False
+
+'get the total rows
+numberRows = Worksheets("grant").UsedRange.Rows.Count
+'fill the column
+Selection.AutoFill Destination:=Range(Worksheets("grant").Cells(2, targetCol), Worksheets("grant").Cells(numberRows, targetCol))
+
+MsgBox "In total " & numberRows - 1 & " vendor numbers are generated.", vbOKOnly••••ˇˇˇˇ
+
+End Sub
