@@ -3,14 +3,15 @@ Option Base 1
 
 Sub match_vendor_number()
 ' %%%
-' Portixn 2020/06/29
-' Ready to use, not completed
+' Portixn 2020/06/29 2020/07/27
+' Ready to use, towards completion
 ' The Excel should consist of 3 tags: operation_panal grant vendor_name
 ' Copy the grant summary to new tab and rename the tab to grant
 ' %%%
 
 Dim targetCol As Integer
 Dim numberRows As Integer
+Dim n%, cnt%, insertCol%, crit As Boolean
 
 'Columns("B:B").Select 'Find the vendors name
 targetCol = Worksheets("grant").Range("A:Z").Find("Grant Recipient", lookat:=xlWhole).Column
@@ -20,7 +21,7 @@ Debug.Print "target_cell's_column is_" & targetCol
 Worksheets("grant").Activate
 Columns(targetCol).Select
 'insert column
-Selection.Insert Shift:=xlToRight, CopyOrigin:=xlFormatFromLeftOrAbove
+Selection.Insert Shift:=xlToRight
 
 'Range("B1").Select 'Name the column
 Cells(1, targetCol).Select
@@ -33,10 +34,28 @@ ActiveCell.FormulaR1C1 = "=VLOOKUP(RC[1],vendor_number!C1:C2,2,FALSE)"
 ActiveWindow.DisplayFormulas = False
 
 'get the total rows
-numberRows = Worksheets("grant").UsedRange.Rows.Count
+numberRows = Worksheets("grant").Columns("A").End(xlDown).Row
+Debug.Print "Row_numbers_is " & numberRows
 'fill the column
 Selection.AutoFill Destination:=Range(Worksheets("grant").Cells(2, targetCol), Worksheets("grant").Cells(numberRows, targetCol))
 
-MsgBox "In total " & numberRows - 1 & " vendor numbers are generated.", vbOKOnly
+'find #N/A (not applicable)
+insertCol = targetCol
+'Count of #N/A
+cnt = 0
+For n = 2 To numberRows
+    'Determine if #N/A
+    crit = WorksheetFunction.IsNA(Cells(n, insertCol))
+    If crit = True Then
+        Cells(n, insertCol).Font.ColorIndex = 3
+        cnt = cnt + 1
+    End If
+Next
+
+Debug.Print "The_#_of_N/A is" & cnt
+
+'for user's notice
+MsgBox "In total " & numberRows - 1 & " entries are detected." & Chr(13) & "" & _
+"There are " & cnt & " Vandor numbers (highted in red) can't be found", vbOKOnly
 
 End Sub
