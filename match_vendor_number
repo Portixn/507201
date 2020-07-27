@@ -56,6 +56,6 @@ Debug.Print "The_#_of_N/A is" & cnt
 
 'for user's notice
 MsgBox "In total " & numberRows - 1 & " entries are detected." & Chr(13) & "" & _
-"There are " & cnt & " Vandor numbers (highted in red) can't be found", vbOKOnly
+"There are " & cnt & " Vendor numbers (highted in red) can't be found", vbOKOnly
 
 End Sub
