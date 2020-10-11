@@ -1,0 +1,230 @@
+Option Base 1
+Option Explicit
+
+Sub generate_import_excel()
+
+'Portixn 10/09/2020
+
+'to do list
+    'string input type should not be variant
+    'not gonna fetch the columns in the generated tables, just generate the data in predetermined sequence
+    'must be an empty batch, or change the entry sequence (HOW???)
+    ' CRITICAL: grants to the same charity require new invoice number
+
+Dim test As Variant
+Dim i As Integer
+
+Dim sheetName As String '$
+Dim nameString As Variant
+Dim nameString2 As Variant
+Dim nameString3 As Variant
+Dim nameString4 As Variant
+
+Dim vendor_number As Variant
+Dim amount As Variant
+Dim tgtClm_vdr As Integer '%
+Dim tgtClm_amnt As Integer
+Dim numberRows As Integer
+Dim inpt As Variant 'when entered, dont know the input type, need further error checkings
+Dim invoice_number As Date
+Dim GL As String
+Dim InvBch As Integer
+Dim tgtClm_vdrNum%, cnt%
+
+
+'Manual inputs required:
+    'Inv#
+inpt = InputBox("input the grant data in the formate of MM/DD/YYYY", "Semi-Automation", "10/01/2020")
+If inpt = "" Then
+    Exit Sub
+Else
+    invoice_number = inpt
+End If
+    'G/L account
+inpt = InputBox("input the G/L, e.g. 0000 or 0000-00-00", "Semi-Automation", 6500)
+If inpt = "" Then
+    Exit Sub
+Else
+    GL = inpt
+End If
+    'Batch number
+inpt = InputBox("input the invoice batch number you are gonna use, e.g. 01", "Semi-Automation", 33)
+If inpt = "" Then
+    Exit Sub
+Else
+    InvBch = inpt
+End If
+
+' locate the columns and rows of the vdr# and $
+numberRows = Worksheets("grant").Columns("A").End(xlDown).Row
+tgtClm_vdr = Worksheets("grant").Range("A:Z").Find("vendor_number", lookat:=xlWhole).Column
+tgtClm_amnt = Worksheets("grant").Range("A:Z").Find("Amount", lookat:=xlWhole).Column
+
+'Tag names
+nameString = Array("Invoices", "Invoice_Details", "Invoice_Payment_Schedules")
+
+'Create new sheets
+'Sheets.Add before:=Worksheets("grant"), Count:=3, Type:=xlWorksheet 'Create blank worksheets
+For i = 3 To 1 Step -1
+    sheetName = nameString(i)
+    Worksheets.Add().Name = sheetName
+Next
+
+'Store the sheets headlines
+nameString2 = Range("invoices_Hdl")
+nameString3 = Range("invoice_details_Hdl")
+nameString4 = Range("invoice_payment_schedules_Hdl")
+'Self check points
+Debug.Print LBound(nameString2, 2)
+Debug.Print UBound(nameString2, 2)
+
+'Store the invoice information (vendor number and grant amount)
+vendor_number = Range(Worksheets("grant").Cells(2, tgtClm_vdr), Worksheets("grant").Cells(numberRows, tgtClm_vdr))
+amount = Range(Worksheets("grant").Cells(2, tgtClm_amnt), Worksheets("grant").Cells(numberRows, tgtClm_amnt))
+
+'Create the blank sheet: Invoices
+Sheets("Invoices").Select
+For i = LBound(nameString2, 2) To UBound(nameString2, 2) Step 1
+    Cells(1, i) = nameString2(1, i)
+Next
+
+'Insert the data required in sheet 1
+For i = 2 To numberRows Step 1
+    Cells(i, 1) = InvBch
+    Cells(i, 2) = i - 1
+    Cells(i, 4) = vendor_number(i - 1, 1)
+    Cells(i, 5) = invoice_number
+    Cells(i, 7) = 1
+    Cells(i, 8) = 12
+    Cells(i, 13) = "DEFLT"
+    Range(Cells(i, 14), Cells(i, 15)) = invoice_number
+    Cells(i, 16) = Year(invoice_number)
+    Cells(i, 17) = Month(invoice_number)
+    Cells(i, 18) = "CAD"
+    Cells(i, 19) = "SP"
+    Cells(i, 20) = 0
+    Cells(i, 21) = 1
+    Cells(i, 22) = 0
+    Cells(i, 23) = "COD"
+    Cells(i, 24) = 0
+    Cells(i, 25) = invoice_number
+    Range(Cells(i, 27), Cells(i, 28)) = 0
+    Cells(i, 29) = 1
+    Cells(i, 30) = 0
+    Cells(i, 31) = 1
+    Cells(i, 32) = "NONE"
+    Range(Cells(i, 38), Cells(i, 55)) = 0
+    Cells(i, 56) = amount(i - 1, 1)
+    Cells(i, 57) = 0
+    Cells(i, 58) = 1
+    Range(Cells(i, 59), Cells(i, 60)) = amount(i - 1, 1)
+    Cells(i, 74) = invoice_number
+    Cells(i, 75) = 0
+    Cells(i, 76) = "DEFLT"
+    Cells(i, 77) = "COD"
+    Cells(i, 80) = amount(i - 1, 1)
+    Range(Cells(i, 81), Cells(i, 91)) = 0
+    Cells(i, 83) = amount(i - 1, 1)
+    Cells(i, 92) = 1
+    Range(Cells(i, 104), Cells(i, 113)) = 0
+    Range(Cells(i, 106), Cells(i, 108)) = 0
+    Cells(i, 118) = 0
+    Range(Cells(i, 121), Cells(i, 123)) = amount(i - 1, 1)
+    Range(Cells(i, 124), Cells(i, 129)) = 0
+    Cells(i, 126) = ""
+    Range(Cells(i, 127), Cells(i, 129)) = 0
+    Range(Cells(i, 132), Cells(i, 136)) = 0
+    Cells(i, 135) = 1
+    Cells(i, 137) = 1
+    Cells(i, 138) = "AP"
+    Cells(i, 139) = 0
+    Cells(i, 140) = "67A"
+    Cells(i, 141) = 1
+    Cells(i, 142) = 0
+    Cells(i, 143) = "CAD"
+    Range(Cells(i, 144), Cells(i, 145)) = 1
+    Cells(i, 148) = 1
+    Range(Cells(i, 149), Cells(i, 183)) = 0
+    Cells(i, 179) = amount(i - 1, 1)
+    Range(Cells(i, 184), Cells(i, 185)) = amount(i - 1, 1)
+    'TEXTVEN skipped
+    Range(Cells(i, 187), Cells(i, 193)) = 0
+    Cells(i, 195) = invoice_number
+    Range(Cells(i, 197), Cells(i, 215)) = 0
+    Range(Cells(i, 216), Cells(i, 217)) = 0
+Next
+
+'assign data to name group "Invoices"
+Range(Cells(1, 1), Cells(numberRows, UBound(nameString2, 2))).Select
+    ActiveWorkbook.Names.Add Name:="Invoices", RefersTo:=Selection
+
+'create the blank sheet: Invoice_Details
+Sheets("Invoice_Details").Select
+For i = LBound(nameString3, 2) To UBound(nameString3, 2) Step 1
+    Cells(1, i) = nameString3(1, i)
+Next
+
+'Insert the data required for sheet 2
+For i = 2 To numberRows Step 1
+    Cells(i, 2) = i - 1
+    Cells(i, 3) = 20
+    Cells(i, 5) = 0
+    Range(Cells(i, 8), Cells(i, 34)) = 0
+    Range(Cells(i, 35), Cells(i, 36)) = GL
+    Cells(i, 37) = amount(i - 1, 1)
+    Cells(i, 39) = amount(i - 1, 1)
+    Range(Cells(i, 40), Cells(i, 52)) = 0
+    Cells(i, 41) = amount(i - 1, 1)
+    Range(Cells(i, 57), Cells(i, 59)) = 0
+    Range(Cells(i, 62), Cells(i, 159)) = 0
+    Cells(i, 64) = invoice_number
+    Cells(i, 66) = ""
+    Cells(i, 68) = 1
+    Cells(i, 73) = ""
+    Range(Cells(i, 144), Cells(i, 145)) = amount(i - 1, 1)
+    Range(Cells(i, 165), Cells(i, 184)) = 0
+    Cells(i, 167) = ""
+Next
+
+'assign data to name group "Invoice_Details"
+Range(Cells(1, 1), Cells(numberRows, UBound(nameString3, 2))).Select
+    ActiveWorkbook.Names.Add Name:="Invoice_Details", RefersTo:=Selection
+
+'creat the blank sheet: Invoice_Payment_Schedules
+Sheets("Invoice_Payment_Schedules").Select
+For i = LBound(nameString4, 2) To UBound(nameString4, 2) Step 1
+    Cells(1, i) = nameString4(1, i)
+Next
+
+'insert the data required for sheet 3
+For i = 2 To numberRows Step 1
+    Cells(i, 2) = i - 1
+    Cells(i, 3) = 1
+    Cells(i, 4) = invoice_number
+    Cells(i, 5) = amount(i - 1, 1)
+    Cells(i, 7) = 0
+    Cells(i, 8) = amount(i - 1, 1)
+    Cells(i, 9) = 0
+Next
+
+'assign data to name group: Invoice_Payment_Schedules
+Range(Cells(1, 1), Cells(numberRows, UBound(nameString4, 2))).Select
+    ActiveWorkbook.Names.Add Name:="Invoice_Payment_Schedules", RefersTo:=Selection
+
+'highlight the grants to the same charity
+Sheets("Invoices").Select
+tgtClm_vdrNum = Worksheets("Invoices").Range("A:Z").Find("IDVEND", lookat:=xlWhole).Column
+Debug.Print "target_cell's_column is_" & tgtClm_vdrNum & " should be 4"
+
+For i = 2 To numberRows Step 1
+    If WorksheetFunction.CountIf(Range(Cells(2, tgtClm_vdrNum), Cells(numberRows, tgtClm_vdrNum)), Cells(i, tgtClm_vdrNum)) > 1 Then
+        Cells(i, tgtClm_vdrNum).Font.ColorIndex = 3
+        cnt = cnt + 1
+    Else
+    End If
+Next
+
+'return to the operation panel
+Sheets("operation_pannel").Select
+
+End Sub
