@@ -9,7 +9,6 @@ Sub generate_import_excel()
     'string input type should not be variant
     'not gonna fetch the columns in the generated tables, just generate the data in predetermined sequence
     'must be an empty batch, or change the entry sequence (HOW???)
-    ' CRITICAL: grants to the same charity require new invoice number
 
 Dim test As Variant
 Dim i As Integer
@@ -29,8 +28,11 @@ Dim inpt As Variant 'when entered, dont know the input type, need further error 
 Dim invoice_number As Date
 Dim GL As String
 Dim InvBch As Integer
-Dim tgtClm_vdrNum%, cnt%
+Dim tgtClm_vdrNum%, cnt%, ftNote%
 
+''Automatically delete the generated worksheets
+'On Error Resume Next
+'Sheets(Array("Invoices", "Invoice_Details", "Invoice_Payment_Schedules")).Delete
 
 'Manual inputs required:
     'Inv#
@@ -75,8 +77,8 @@ nameString2 = Range("invoices_Hdl")
 nameString3 = Range("invoice_details_Hdl")
 nameString4 = Range("invoice_payment_schedules_Hdl")
 'Self check points
-Debug.Print LBound(nameString2, 2)
-Debug.Print UBound(nameString2, 2)
+Debug.Print LBound(nameString2, 2) & " should be 1"
+Debug.Print UBound(nameString2, 2) & " should be 217"
 
 'Store the invoice information (vendor number and grant amount)
 vendor_number = Range(Worksheets("grant").Cells(2, tgtClm_vdr), Worksheets("grant").Cells(numberRows, tgtClm_vdr))
@@ -93,7 +95,7 @@ For i = 2 To numberRows Step 1
     Cells(i, 1) = InvBch
     Cells(i, 2) = i - 1
     Cells(i, 4) = vendor_number(i - 1, 1)
-    Cells(i, 5) = invoice_number
+    Cells(i, 5) = "'" & invoice_number
     Cells(i, 7) = 1
     Cells(i, 8) = 12
     Cells(i, 13) = "DEFLT"
@@ -166,6 +168,7 @@ Next
 
 'Insert the data required for sheet 2
 For i = 2 To numberRows Step 1
+    Cells(i, 1) = InvBch
     Cells(i, 2) = i - 1
     Cells(i, 3) = 20
     Cells(i, 5) = 0
@@ -198,6 +201,7 @@ Next
 
 'insert the data required for sheet 3
 For i = 2 To numberRows Step 1
+    Cells(i, 1) = InvBch
     Cells(i, 2) = i - 1
     Cells(i, 3) = 1
     Cells(i, 4) = invoice_number
@@ -220,6 +224,15 @@ For i = 2 To numberRows Step 1
     If WorksheetFunction.CountIf(Range(Cells(2, tgtClm_vdrNum), Cells(numberRows, tgtClm_vdrNum)), Cells(i, tgtClm_vdrNum)) > 1 Then
         Cells(i, tgtClm_vdrNum).Font.ColorIndex = 3
         cnt = cnt + 1
+    Else
+    End If
+Next
+
+'relabel
+For i = 2 To numberRows Step 1
+    If WorksheetFunction.CountIf(Range(Cells(2, tgtClm_vdrNum), Cells(i, tgtClm_vdrNum)), Cells(i, tgtClm_vdrNum)) > 1 Then
+        ftNote = WorksheetFunction.CountIf(Range(Cells(2, tgtClm_vdrNum), Cells(i, tgtClm_vdrNum)), Cells(i, tgtClm_vdrNum))
+        Cells(i, 5) = "'" & invoice_number & "_" & ftNote
     Else
     End If
 Next
