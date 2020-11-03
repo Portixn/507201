@@ -1,0 +1,54 @@
+Option Explicit
+Option Base 1
+
+'For test
+Sub toCallFunction()
+
+Dim test As Boolean
+test = general_search("vendor_number", "grant")
+
+End Sub
+'Test end here
+
+Private Function general_search(a As Variant, b As Variant)
+'determine if certain content can be found in named worksheet
+
+'Portixn
+'11/03/2020
+'a is the content you want to find
+'b is the name of the worksheet
+
+Dim output As Boolean
+Dim searchResult As Variant
+
+'if cannot find the worksheet or the specific content
+On Error GoTo errorHandler
+
+'need to put the string into array
+a = Array(a)
+b = Array(b)
+
+'Self-check point
+Debug.Print "a = " & a(1)
+Debug.Print "b = " & b(1)
+
+'search the information
+searchResult = Sheets(b(1)).Range("A:Z").find(a(1), lookat:=xlWhole)
+
+If Not IsEmpty(searchResult) Then
+    output = True 'match the search
+Else
+    output = False 'cant match the search
+End If
+
+'assign function output
+general_search = output
+
+Exit Function
+
+errorHandler:
+
+    searchResult = Empty
+    Resume Next
+    
+End Function
