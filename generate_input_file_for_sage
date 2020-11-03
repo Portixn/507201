@@ -30,9 +30,25 @@ Dim GL As String
 Dim InvBch As Integer
 Dim tgtClm_vdrNum%, cnt%, ftNote%
 
-''Automatically delete the generated worksheets
-'On Error Resume Next
-'Sheets(Array("Invoices", "Invoice_Details", "Invoice_Payment_Schedules")).Delete
+'Target import worksheet tag names
+nameString = Array("Invoices", "Invoice_Details", "Invoice_Payment_Schedules")
+
+'%%% Automatically detect the generated worksheets %%%
+Dim ticker As Boolean
+
+For i = 1 To 3 Step 1
+    'call the private function
+    ticker = general_search("CNTBTCH", nameString(i))
+    If ticker = True Then
+        MsgBox "Please delete the workbook tab 'Invoices, Invoices_Details, Schedule'" & _
+        Chr(10) & "Excel cannot have two same tab names", vbOKOnly
+        
+        'Sheets(Array("Invoices", "Invoice_Details", "Invoice_Payment_Schedules")).Delete
+        
+        Exit Sub
+    Else
+    End If
+Next
 
 'Manual inputs required:
     'Inv#
@@ -241,3 +257,46 @@ Next
 Sheets("operation_pannel").Select
 
 End Sub
+
+Private Function general_search(a As Variant, b As Variant)
+'determine if certain content can be found in named worksheet
+
+'Portixn
+'11/03/2020
+'a is the content you want to find
+'b is the name of the worksheet
+
+Dim output As Boolean
+Dim searchResult As Variant
+
+'if cannot find the worksheet or the specific content
+On Error GoTo errorHandler
+
+'need to put the string into array
+a = Array(a)
+b = Array(b)
+
+'Self-check point
+Debug.Print "a = " & a(1)
+Debug.Print "b = " & b(1)
+
+'search the information
+searchResult = Sheets(b(1)).Range("A:Z").find(a(1), lookat:=xlWhole)
+
+If Not IsEmpty(searchResult) Then
+    output = True 'match the search
+Else
+    output = False 'cant match the search
+End If
+
+'assign function output
+general_search = output
+
+Exit Function
+
+errorHandler:
+
+    searchResult = Empty
+    Resume Next
+
+End Function
