@@ -52,7 +52,7 @@ Next
 
 'Manual inputs required:
     'Inv#
-inpt = InputBox("input the grant data in the formate of MM/DD/YYYY", "Semi-Automation", "10/01/2020")
+inpt = InputBox("input the grant data in the formate of MM/DD/YYYY", "Semi-Automation", Date)
 If inpt = "" Then
     Exit Sub
 Else
