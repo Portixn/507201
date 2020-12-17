@@ -13,7 +13,10 @@ Dim targetCol As Integer
 Dim numberRows As Integer
 Dim n%, cnt%, insertCol%, crit As Boolean
 
-'Columns("B:B").Select 'Find the vendors name
+'clear the clipboard
+Application.CutCopyMode = False
+
+'Columns("B:B").Select 'Find the vendors column
 targetCol = Worksheets("grant").Range("A:Z").Find("Grant Recipient", lookat:=xlWhole).Column
 Debug.Print "target_cell's_column is_" & targetCol
 
