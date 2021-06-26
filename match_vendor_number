@@ -53,6 +53,9 @@ For n = 2 To numberRows
         Cells(n, insertCol).Font.ColorIndex = 3
         cnt = cnt + 1
     End If
+    If crit = False Then
+        Cells(n, insertCol).Font.ColorIndex = 1
+    End If
 Next
 
 Debug.Print "The_#_of_N/A is" & cnt
