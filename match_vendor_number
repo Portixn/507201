@@ -12,6 +12,16 @@ Sub match_vendor_number()
 Dim targetCol As Integer
 Dim numberRows As Integer
 Dim n%, cnt%, insertCol%, crit As Boolean
+Dim replace As Variant
+
+'replace the 'vendor_number' (generated before) to 'superseded'
+For Each replace In Worksheets("grant").Range("A1:Z1")
+    test = replace.Column & replace.Row
+    If replace = "vendor_number" Then
+        replace = "superseded"
+        Worksheets("grant").Cells(replace.Row, replace.Column).Font.ColorIndex = 5
+    End If
+Next
 
 'clear the clipboard
 Application.CutCopyMode = False
@@ -25,6 +35,8 @@ Worksheets("grant").Activate
 Columns(targetCol).Select
 'insert column
 Selection.Insert Shift:=xlToRight
+'resume the color to inserted column to black again
+Worksheets("grant").Cells(1, targetCol).Font.ColorIndex = 1
 
 'Range("B1").Select 'Name the column
 Cells(1, targetCol).Select
