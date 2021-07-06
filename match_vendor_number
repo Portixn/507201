@@ -12,7 +12,8 @@ Sub match_vendor_number()
 Dim targetCol As Integer
 Dim numberRows As Integer
 Dim n%, cnt%, insertCol%, crit As Boolean
-Dim replace As Variant
+Dim replace As Range
+Dim test as variant
 
 'replace the 'vendor_number' (generated before) to 'superseded'
 For Each replace In Worksheets("grant").Range("A1:Z1")
