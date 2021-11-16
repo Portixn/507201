@@ -1,0 +1,105 @@
+Option Explicit
+Option Base 1
+' Portixn
+' November 14th
+'1.Create the worksheet and vba embedded button
+'2.Queryable dynamic foreign exchange rate calculator via x-rate.com
+'Instruction: copy and paste to your empty module and run it directly
+'Prerequistie: donot rename the macro module to "ImportWebTable"
+
+Sub ImportWebTable()
+
+Dim URL As String
+Dim ws As Worksheet
+Dim qt As QueryTable
+Dim i As Integer
+
+On Error GoTo ErrorHandler
+
+'prerequisite setup: create "xrate" worksheet and default value if it is the first time
+For i = 1 To Sheets.Count
+    If Sheets(i).Name = "xrate" Then GoTo jumpPoint1
+Next
+
+Worksheets.Add.Name = "xrate"
+Set ws = Worksheets("xrate")
+
+With Worksheets("xrate")
+    .Range("A1") = "Currency"
+    .Range("A2") = "Amount"
+    .Range("B1") = "CNY"
+    .Range("B2") = "1"
+    .Range("A17") = "***DO NOT rename the tab***"
+End With
+
+'original website https://www.x-rates.com/table/?from=USD&amount=1
+URL = "http://www.x-rates.com/table/?from=" & _
+    ws.Range("B1").Value & _
+    "&amount=" & _
+    ws.Range("B2").Value
+
+'query the table on the website
+Set qt = ws.QueryTables.Add(Connection:="URL;" & URL, _
+    Destination:=Range("A5"))
+    
+'setup the query defult settings
+With qt
+    'Automatically refresh: .RefreshPeriod = 5
+    .RefreshOnFileOpen = True
+    .Name = "XRates"
+    'None: plain text, RTF: rich text formating (raw text), all: with hyberlink on the website
+    .WebFormatting = xlWebFormattingRTF
+    ' <table>...</table>, xlAlltables, xlSpecifiedTables
+    .WebSelectionType = xlSpecifiedTables
+    .WebTables = "1"
+    .Refresh
+End With
+
+'create the VBA button
+Dim t As Range
+Dim btn As Variant
+Set t = ActiveSheet.Range("C2")
+Set btn = ActiveSheet.Shapes.AddShape(msoShapeRectangle, t.Left, t.Top, t.Width, t.Height)
+With btn
+    .TextFrame2.TextRange.Characters.Text = "update"
+    .OnAction = "ImportWebTable"
+End With
+
+Exit Sub
+
+jumpPoint1:
+Set ws = Worksheets("xrate")
+
+'Errorchecking
+If ws.Range("B1").Value = "" Then
+    MsgBox "You must choose a currency!", vbExclamation
+    Exit Sub
+End If
+
+If Not IsNumeric(ws.Range("B2").Value) Then
+    MsgBox "The amount must be a number!", vbExclamation
+    Exit Sub
+End If
+
+'only update the information
+Set qt = ws.QueryTables("XRates")
+
+'original website https://www.x-rates.com/table/?from=USD&amount=1
+URL = "http://www.x-rates.com/table/?from=" & _
+    ws.Range("B1").Value & _
+    "&amount=" & _
+    ws.Range("B2").Value
+
+With qt
+    .Connection = "URL;" & URL
+    .Refresh
+End With
+
+Exit Sub
+
+ErrorHandler:
+    MsgBox "If error, then exit the Sub", vbOKOnly
+    Sheets("xrate").Delete
+Exit Sub
+
+End Sub
