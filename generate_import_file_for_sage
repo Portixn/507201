@@ -4,6 +4,8 @@ Option Explicit
 Sub generate_import_excel()
 
 'Portixn 10/09/2020
+'Portixn 03/17/2022
+    'Add invoice entry description
 
 'to do list
     'string input type should not be variant
@@ -19,6 +21,7 @@ Dim nameString2 As Variant
 Dim nameString3 As Variant
 Dim nameString4 As Variant
 
+Dim vendor_name As Variant
 Dim vendor_number As Variant
 Dim amount As Variant
 Dim tgtClm_vdr As Integer '%
@@ -28,7 +31,7 @@ Dim inpt As Variant 'when entered, dont know the input type, need further error 
 Dim invoice_number As Date
 Dim GL As String
 Dim InvBch As Integer
-Dim tgtClm_vdrNum%, cnt%, ftNote%
+Dim tgtClm_vdrNum%, tgtClm_vNm%, cnt%, ftNote%
 
 'Target import worksheet tag names
 nameString = Array("Invoices", "Invoice_Details", "Invoice_Payment_Schedules")
@@ -73,10 +76,11 @@ Else
     InvBch = inpt
 End If
 
-' locate the columns and rows of the vdr# and $
+' locate the columns and rows of the vdr# , $ and vendor name
 numberRows = Worksheets("grant").Columns("A").End(xlDown).Row
 tgtClm_vdr = Worksheets("grant").Range("A:Z").Find("vendor_number", lookat:=xlWhole).Column
 tgtClm_amnt = Worksheets("grant").Range("A:Z").Find("Amount", lookat:=xlWhole).Column
+tgtClm_vNm = Worksheets("grant").Range("A:Z").Find("Grant Recipient", lookat:=xlWhole).Column
 
 'Tag names
 nameString = Array("Invoices", "Invoice_Details", "Invoice_Payment_Schedules")
@@ -96,9 +100,10 @@ nameString4 = Range("invoice_payment_schedules_Hdl")
 Debug.Print LBound(nameString2, 2) & " should be 1"
 Debug.Print UBound(nameString2, 2) & " should be 217"
 
-'Store the invoice information (vendor number and grant amount)
+'Store the invoice information (vendor number, grant amount and vendor name)
 vendor_number = Range(Worksheets("grant").Cells(2, tgtClm_vdr), Worksheets("grant").Cells(numberRows, tgtClm_vdr))
 amount = Range(Worksheets("grant").Cells(2, tgtClm_amnt), Worksheets("grant").Cells(numberRows, tgtClm_amnt))
+vendor_name = Range(Worksheets("grant").Cells(2, tgtClm_vNm), Worksheets("grant").Cells(numberRows, tgtClm_vNm))
 
 'Create the blank sheet: Invoices
 Sheets("Invoices").Select
@@ -114,6 +119,7 @@ For i = 2 To numberRows Step 1
     Cells(i, 5) = "'" & invoice_number
     Cells(i, 7) = 1
     Cells(i, 8) = 12
+    Cells(i, 11) = "grant to" & vendor_name(i - 1, 1) & "-" & invoice_number
     Cells(i, 13) = "DEFLT"
     Range(Cells(i, 14), Cells(i, 15)) = invoice_number
     Cells(i, 16) = Year(invoice_number)
@@ -188,6 +194,7 @@ For i = 2 To numberRows Step 1
     Cells(i, 2) = i - 1
     Cells(i, 3) = 20
     Cells(i, 5) = 0
+    Cells(i, 7) = "grant to" & vendor_name(i - 1, 1) & "-" & invoice_number
     Range(Cells(i, 8), Cells(i, 34)) = 0
     Range(Cells(i, 35), Cells(i, 36)) = GL
     Cells(i, 37) = amount(i - 1, 1)
@@ -201,6 +208,7 @@ For i = 2 To numberRows Step 1
     Cells(i, 68) = 1
     Cells(i, 73) = ""
     Range(Cells(i, 144), Cells(i, 145)) = amount(i - 1, 1)
+    Cells(i, 164) = "grant to" & vendor_name(i - 1, 1) & "-" & invoice_number
     Range(Cells(i, 165), Cells(i, 184)) = 0
     Cells(i, 167) = ""
 Next
