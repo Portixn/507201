@@ -1,1 +1,26 @@
+Sub separate_BK()
 
+
+Dim numberRows%
+Dim tgtClm_dt%, tgtClm_des%, tgtClm_debit%, tgtClm_credit%
+'date is not a legit name for variable
+Dim dt As Variant, des As Variant, debit As Variant, credit As Variant
+
+
+
+'dimension of data
+numberRows = Worksheets("Bank Statement").Columns("A").End(xlDown).Row
+
+'locate the colum of the date, description debit and credit
+tgtClm_dt = Worksheets("Bank Statement").Range("A:Z").Find("date").Column
+tgtClm_des = Worksheets("bank Statement").Range("A:Z").Find("description").Column
+tgtClm_debit = Worksheets("Bank Statement").Range("A:Z").Find("Debit Amount").Column
+tgtClm_credit = Worksheets("Bank Statement").Range("A:Z").Find("Credit Amount").Column
+
+'store the data: date des debit credit
+dt = Range(Worksheets("Bank Statement").Cells(2, tgtClm_dt), Worksheets("Bank Statement").Cells(numberRows, tgtClm_dt))
+des = Range(Worksheets("Bank Statement").Cells(2, tgtClm_des), Worksheets("Bank Statement").Cells(numberRows, tgtClm_des))
+debit = Range(Worksheets("Bank Statement").Cells(2, tgtClm_debit), Worksheets("Bank Statement").Cells(numberRows, tgtClm_debit))
+credit = Range(Worksheets("bank Statement").Cells(2, tgtClm_credit), Worksheets("Bank Statement").Cells(numberRows, tgtClm_credit))
+
+End Sub
